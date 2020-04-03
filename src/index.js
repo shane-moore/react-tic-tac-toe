@@ -2,24 +2,41 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+// create a Board component
+// create a square component
+// create a Game component
+
+// every square component has a value passed in from renderSquare upon creation
+// realize that the square should be null until selected then replaced with X or O
+// first try to get them to be filled with O by having an array in state constructor by squares property that will be updated upon click of button
+
+// square becomes a controlled component since Board has full control over it
+// changing Square to a function component since only has a render method
+// onClick event listener has reference to the Board's handleClick callback function
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
-    </button>
-  );
+    <button
+      className="square"
+      onClick={props.onClick}>{props.value}</button>
+  )
 }
 
 class Board extends React.Component {
+
+
+  // using immutability approach to change state by copying original squares array, operating on new array, and replacing the data with new copy with desired changes
+  // easier to detect changes to immutable objects
+  // can more easily build pure components with immutable objects
+
   renderSquare(i) {
     return (
       <Square
         value={this.props.squares[i]}
-        onClick={() => this.props.onClick(i)}
-      />
-    );
+        // onClick event is passed down to Square controlled component to notify this handleClick event
+        // callback f() defined in method since need reference to i to be in scope, if define outside, won't get the "i"
+        onClick={() => this.props.onClick(i)} />
+    )
   }
-
   render() {
     return (
       <div>
@@ -43,17 +60,17 @@ class Board extends React.Component {
   }
 }
 
+
 class Game extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
-      history: [
-        {
-          squares: Array(9).fill(null)
-        }
-      ],
-      stepNumber: 0,
-      xIsNext: true
+      history: [{
+        squares: Array(9).fill(null)
+      }],
+      xIsNext: true,
+      stepNumber: 0
     };
   }
 
@@ -64,22 +81,20 @@ class Game extends React.Component {
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? "X" : "O";
+    squares[i] = this.state.xIsNext ? "X" : "O"
     this.setState({
-      history: history.concat([
-        {
-          squares: squares
-        }
-      ]),
+      history: history.concat({
+        squares: squares
+      }),
+      xIsNext: !this.state.xIsNext,
       stepNumber: history.length,
-      xIsNext: !this.state.xIsNext
     });
   }
 
   jumpTo(step) {
     this.setState({
       stepNumber: step,
-      xIsNext: step % 2 === 0
+      xIsNext: (step % 2) === 0,
     });
   }
 
@@ -89,25 +104,31 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      const desc = move ? "Go to move #" + move : "Go to game start";
+      const desc = move ?
+        'Go to move #' + move :
+        'Go to game start';
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button onClick={() => this.jumpTo(move)}>{desc}
+          </button>
         </li>
       );
     });
 
     let status;
     if (winner) {
-      status = "Winner: " + winner;
+      status = 'Winner: ' + winner;
     } else {
-      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
 
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={current.squares} onClick={i => this.handleClick(i)} />
+          <Board
+            squares={current.squares}
+            onClick={(i) => this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
           <div>{status}</div>
@@ -120,12 +141,15 @@ class Game extends React.Component {
 
 // ========================================
 
-ReactDOM.render(<Game />, document.getElementById("root"));
+ReactDOM.render(
+  <Game />,
+  document.getElementById('root')
+);
 
 function calculateWinner(squares) {
   const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
+    [0, 1, 2,],
+    [3, 4, 5,],
     [6, 7, 8],
     [0, 3, 6],
     [1, 4, 7],
