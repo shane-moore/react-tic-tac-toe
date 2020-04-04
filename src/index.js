@@ -11,6 +11,7 @@ function Square(props) {
   )
 }
 
+// TODO: Rewrite Board to use two loops to make the squares
 class Board extends React.Component {
 
   renderSquare(i) {
@@ -18,12 +19,25 @@ class Board extends React.Component {
       <Square value={this.props.squares[i]} onClick={() => this.props.onClick(i)} />
     )
   }
-  // should be able to stop if there is a winner
+  createSquare = () => {
+    let row = [];
+    let k = 3;
+    let j = 0
+    for (let i = 0; i < 3; i++) {
+      let square = [];
+      for (j; j < k; j++) {
+        square.push(this.renderSquare(j));
+      }
+      k += 3;
+      row.push(<div className="board-row">{square}</div>)
+    }
+    return row;
+  }
 
   render() {
     return (
       <div>
-        <div className="board-row">
+        {/* <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
           {this.renderSquare(2)}
@@ -37,7 +51,8 @@ class Board extends React.Component {
           {this.renderSquare(6)}
           {this.renderSquare(7)}
           {this.renderSquare(8)}
-        </div>
+        </div> */}
+        {this.createSquare()}
       </div>
     )
   }
