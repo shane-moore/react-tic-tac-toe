@@ -6,6 +6,21 @@ import "./index.css";
 
 
 function Square(props) {
+  if (calculateWinner(props.squares)) {
+    let winner = props.xIsNext ? "O" : "X";
+    let winnersIndexes = props.squares.reduce((total, val, index) => {
+      if (val === winner) total.push(index);
+      return total;
+      // return total;
+    }, [])
+    console.log(props.index);
+    if (winnersIndexes.includes(props.index)) {
+      console.log(props.value);
+      return (
+        <div className="square" onClick={props.onClick}><u>{props.value}</u></div>
+      )
+    } else return <div className="square" onClick={props.onClick}>{props.value}</div>
+  }
   return (
     <div className="square" onClick={props.onClick}>{props.value}</div>
   )
@@ -14,11 +29,14 @@ function Square(props) {
 
 
 // on button click, make copy of array, sort in reverse order.
+// need to bold the passed down winning squares
+// find index of winners by using find index on squares searching for winner
+//
 class Board extends React.Component {
 
   renderSquare(i) {
     return (
-      <Square value={this.props.squares[i]} onClick={() => this.props.onClick(i)} />
+      <Square value={this.props.squares[i]} index={i} squares={this.props.squares} xIsNext={this.props.xIsNext} onClick={() => this.props.onClick(i)} />
     )
   }
   createSquare = () => {
@@ -68,7 +86,7 @@ class Board extends React.Component {
 // update index of state array upon selecting a button
 //
 // TODO add toggle button to game component that will update state of "ascending"
-
+// TODO add highlights to the three winning squares when someone wins
 class Game extends React.Component {
   // constructor needs to keep track of all possible squares arrays
   // concat first null array with click event moves
@@ -135,9 +153,10 @@ class Game extends React.Component {
         break;
     }
 
-    if (calculateWinner(squares) || squares[i]) {
+    if (squares[i] || calculateWinner(squares)) {
       return;
     }
+
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
       history: history.concat({
@@ -178,7 +197,6 @@ class Game extends React.Component {
     const ascending = this.state.ascending;
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    console.log(current);
     const squares = current.squares;
     const status = calculateWinner(squares) ?
       `Winner: ${this.state.xIsNext ? "O" : "X"}` :
@@ -211,6 +229,7 @@ class Game extends React.Component {
         <Board
           squares={squares}
           onClick={(i) => this.handleClick(i)}
+          xIsNext={this.state.xIsNext}
         />
         <div className="game-info">
           <button onClick={() => this.orderToggle()}> Toggle Order</button>
