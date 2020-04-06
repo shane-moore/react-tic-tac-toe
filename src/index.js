@@ -11,7 +11,9 @@ function Square(props) {
   )
 }
 
-// TODO: Rewrite Board to use two loops to make the squares
+
+
+// on button click, make copy of array, sort in reverse order.
 class Board extends React.Component {
 
   renderSquare(i) {
@@ -65,7 +67,7 @@ class Board extends React.Component {
 // dynamic list creates buttons upon updates click events and allows you to update size of array if you select the button
 // update index of state array upon selecting a button
 //
-// TODO display location for each move in format (col, row) in the move history list
+// TODO add toggle button to game component that will update state of "ascending"
 
 class Game extends React.Component {
   // constructor needs to keep track of all possible squares arrays
@@ -83,6 +85,7 @@ class Game extends React.Component {
       ],
       xIsNext: true,
       stepNumber: 0,
+      ascending: true
     }
   }
   // * col 1 is [0,3,6], col 2 is [1, 4,7], col 3 is [2,5,8]
@@ -131,7 +134,7 @@ class Game extends React.Component {
         row = 3;
         break;
     }
-    console.log(col, row);
+
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
@@ -163,7 +166,16 @@ class Game extends React.Component {
     })
   }
 
+  orderToggle() {
+    this.setState({
+      ascending: !this.state.ascending
+    })
+    console.log(this.state.ascending);
+  }
+
+  // TODO: add toggle button to this method
   render() {
+    const ascending = this.state.ascending;
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     console.log(current);
@@ -172,6 +184,8 @@ class Game extends React.Component {
       `Winner: ${this.state.xIsNext ? "O" : "X"}` :
       `Next player: ${this.state.xIsNext ? "X" : "O"}`;
     let spot;
+
+
 
     // TODO: bold currently selected items in the move list
     const moves = history.map((step, move) => {
@@ -190,6 +204,8 @@ class Game extends React.Component {
       )
     })
 
+    const reverseMoves = this.state.ascending ? moves : moves.reverse();
+
     return (
       <div className="game">
         <Board
@@ -197,8 +213,9 @@ class Game extends React.Component {
           onClick={(i) => this.handleClick(i)}
         />
         <div className="game-info">
+          <button onClick={() => this.orderToggle()}> Toggle Order</button>
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <ol>{reverseMoves}</ol>
         </div>
       </div>
     );
